@@ -1,6 +1,3 @@
-ls = localStorage;
-arr = [];
-
 window.addEventListener("load", () => {
   const form = document.querySelector("#new-task-form");
   const input = document.querySelector("#new-task-input");
@@ -43,12 +40,16 @@ window.addEventListener("load", () => {
     task_delete_el.classList.add("delete");
     task_delete_el.innerText = "Delete";
 
-    task_actions_el.appendChild(task_edit_el);
-    task_actions_el.appendChild(task_delete_el);
+    //task_actions_el.appendChild(task_edit_el);
+    //task_actions_el.appendChild(task_delete_el);
 
-    task_el.appendChild(task_actions_el);
+    task_actions_el.append(task_edit_el, task_delete_el);
 
-    list_el.appendChild(task_el);
+    // task_el.appendChild(task_actions_el);
+    // list_el.appendChild(task_el);
+
+    task_el.append(task_actions_el);
+    list_el.append(task_el);
 
     input.value = "";
 
@@ -65,6 +66,7 @@ window.addEventListener("load", () => {
 
     task_delete_el.addEventListener("click", () => {
       list_el.removeChild(task_el);
+      //list_el.remove(task_el);
     });
   });
 });
