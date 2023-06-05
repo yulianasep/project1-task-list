@@ -1,11 +1,17 @@
 window.addEventListener("load", () => {
-  const form = document.querySelector("#new-task-form");
-  const input = document.querySelector("#new-task-input");
-  const list_el = document.querySelector("#tasks");
+  const form = document.getElementById("new-task-form");
+  const input = document.getElementById("new-task-input");
+  const listEl = document.getElementById("tasks");
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", handleFormSubmit);
+
+  /**
+   * Handles the form submission event
+   * @param {Event} event - The form submission event
+   * @returns {void}
+   */
+  function handleFormSubmit(event) {
     event.preventDefault();
-
     const task = input.value;
 
     if (!task) {
@@ -13,60 +19,118 @@ window.addEventListener("load", () => {
       return;
     }
 
-    const task_el = document.createElement("div");
-    task_el.classList.add("task");
-
-    const task_content_el = document.createElement("div");
-    task_content_el.classList.add("content");
-
-    task_el.appendChild(task_content_el);
-
-    const task_input_el = document.createElement("input");
-    task_input_el.classList.add("text");
-    task_input_el.type = "text";
-    task_input_el.value = task;
-    task_input_el.setAttribute("readonly", "readonly");
-
-    task_content_el.appendChild(task_input_el);
-
-    const task_actions_el = document.createElement("div");
-    task_actions_el.classList.add("actions");
-
-    const task_edit_el = document.createElement("button");
-    task_edit_el.classList.add("edit");
-    task_edit_el.innerText = "Edit";
-
-    const task_delete_el = document.createElement("button");
-    task_delete_el.classList.add("delete");
-    task_delete_el.innerText = "Delete";
-
-    //task_actions_el.appendChild(task_edit_el);
-    //task_actions_el.appendChild(task_delete_el);
-
-    task_actions_el.append(task_edit_el, task_delete_el);
-
-    // task_el.appendChild(task_actions_el);
-    // list_el.appendChild(task_el);
-
-    task_el.append(task_actions_el);
-    list_el.append(task_el);
-
+    createTaskElement(task);
     input.value = "";
+  }
 
-    task_edit_el.addEventListener("click", () => {
-      if (task_edit_el.innerText.toLowerCase() == "edit") {
-        task_input_el.removeAttribute("readonly");
-        task_input_el.focus();
-        task_edit_el.innerText = "Save";
+  /**
+   * Creates a new task element and appends it to the task list
+   * @param {string} task - The task content
+   * @returns {void}
+   */
+  function createTaskElement(task) {
+    const taskEl = document.createElement("div");
+    taskEl.classList.add("task");
+
+    const taskContentEl = createTaskContentElement(task);
+    const taskActionsEl = createTaskActionsElement(taskEl);
+    appendElements(taskEl, taskContentEl, taskActionsEl);
+    listEl.appendChild(taskEl);
+  }
+
+  /**
+   * Creates the content element for a task
+   * @param {string} task - The task content
+   * @returns {HTMLElement} - The task content element
+   */
+  function createTaskContentElement(task) {
+    const taskContentEl = document.createElement("div");
+    taskContentEl.classList.add("content");
+
+    const taskInputEl = createTaskInput(task);
+    taskContentEl.appendChild(taskInputEl);
+
+    return taskContentEl;
+  }
+
+  /**
+   * Creates the input element for a task
+   * @param {string} task - The task content
+   * @returns {HTMLInputElement} - The task input element
+   */
+  function createTaskInput(task) {
+    const taskInputEl = document.createElement("input");
+    taskInputEl.classList.add("text");
+    taskInputEl.type = "text";
+    taskInputEl.value = task;
+    taskInputEl.setAttribute("readonly", "readonly");
+
+    return taskInputEl;
+  }
+
+  /**
+   *Creates the actions element for a task
+   * @param {HTMLElement} taskEl - The task element
+   * @returns {HTMLElement} - The task actions element
+   */
+  function createTaskActionsElement(taskEl) {
+    const taskActionsEl = document.createElement("div");
+    taskActionsEl.classList.add("actions");
+
+    const taskEditEl = createButtonElement("Edit", "edit", handleEditClick);
+    const taskDeleteEl = createButtonElement(
+      "Delete",
+      "delete",
+      handleDeleteClick
+    );
+    taskActionsEl.append(taskEditEl, taskDeleteEl);
+
+    /**
+     * Handles the click event for the Edit button
+     */
+    function handleEditClick() {
+      if (taskEditEl.innerText.toLowerCase() === "edit") {
+        taskEl.querySelector("input").removeAttribute("readonly");
+        taskEl.querySelector("input").focus();
+        taskEditEl.innerText = "Save";
       } else {
-        task_input_el.setAttribute("readonly", "readonly");
-        task_edit_el.innerText = "Edit";
+        taskEl.querySelector("input").setAttribute("readonly", "readonly");
+        taskEditEl.innerText = "Edit";
       }
-    });
+    }
 
-    task_delete_el.addEventListener("click", () => {
-      list_el.removeChild(task_el);
-      //list_el.remove(task_el);
-    });
-  });
+    /**
+     * Handles the click event for the Delete button
+     */
+    function handleDeleteClick() {
+      listEl.removeChild(taskEl);
+    }
+
+    return taskActionsEl;
+  }
+
+  /**
+   * Creates a button element with the specified text, class name, and click handler
+   * @param {string} text  - The text content of the button
+   * @param {string} className - The name of the class that you want to add
+   * @param {function} clickHandler - The click event handler function for the button
+   * @returns {HTMLButtonElement} - The created button element
+   */
+  function createButtonElement(text, className, clickHandler) {
+    const buttonEl = document.createElement("button");
+    buttonEl.classList.add(className);
+    buttonEl.innerText = text;
+    buttonEl.addEventListener("click", clickHandler);
+
+    return buttonEl;
+  }
+
+  /**
+   * Appends multiple elements to a parent element
+   * @param {HTMLElement} parentEl - The parent element to append the elements to
+   * @param  {*} elements - The elements to append
+   */
+  function appendElements(parentEl, ...elements) {
+    elements.forEach((el) => parentEl.appendChild(el));
+  }
 });
